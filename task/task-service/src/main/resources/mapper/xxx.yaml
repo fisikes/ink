@@ -1,0 +1,58 @@
+databaseName: shadow_db
+
+dataSources:
+  ds:
+    url: jdbc:mysql://192.168.104.151:3306/example_001?useSSL=false
+    username: root
+    password: AiRadar@2022
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+  shadow_ds:
+    url: jdbc:mysql://192.168.104.151:3306/example_002?useSSL=false
+    username: root
+    password: AiRadar@2022
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+
+rules:
+- !SHADOW
+  dataSources:
+    shadowDataSource:
+      productionDataSourceName: ds
+      shadowDataSourceName: shadow_ds
+  tables:
+    t_order:
+      dataSourceNames:
+        - shadowDataSource
+      shadowAlgorithmNames:
+        - user_id_insert_match_algorithm
+        - user_id_select_match_algorithm
+  shadowAlgorithms:
+    user_id_insert_match_algorithm:
+      type: REGEX_MATCH
+      props:
+        operation: insert
+        column: tenant_id
+        regex: "[1]"
+    user_id_update_match_algorithm:
+      type: REGEX_MATCH
+      props:
+        operation: update
+        column: tenant_id
+        regex: "[1]"
+    user_id_select_match_algorithm:
+      type: REGEX_MATCH
+      props:
+        operation: select
+        column: tenant_id
+        regex: "[1]"
+    sql_hint_algorithm:
+      type: SQL_HINT
+      props:
+        foo: bar

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: dev-tool-server
+server:
+  port: 10001
